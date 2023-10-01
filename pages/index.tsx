@@ -53,10 +53,18 @@ const App: React.FC = () => {
         contentLabel="Crypto and Chain Modal"
         style={{
           content: {
-            // ... existing styles
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "#131313",
+            borderRadius: "10px",
+            height: "450px",
+            boxShadow:
+              "rgb(170 21 197 / 30%) 0 0 10px 0, rgb(170 21 197 / 30%) 0 40px 120px 0",
           },
           overlay: {
-            // ... existing styles
+            backgroundColor: "rgba(255, 255, 255, 0.75)", // This is for testing purposes
           },
         }}
       >
