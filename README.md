@@ -1,3 +1,17 @@
+# Setup .env.local
+
+Write a `.env.local` file with the following variables:
+
+```bash
+ETHEREUM_SEPOLIA_RPC_URL=
+OPTIMISM_GOERLI_RPC_URL=
+ARBITRUM_TESTNET_RPC_URL=
+AVALANCHE_FUJI_RPC_URL=
+POLYGON_MUMBAI_RPC_URL=
+```
+
+You can get these URLs from [infura.io](https://www.infura.io/)
+
 This is a [RainbowKit](https://rainbowkit.com) + [wagmi](https://wagmi.sh) + [Next.js](https://nextjs.org/) project bootstrapped with [`create-rainbowkit`](https://github.com/rainbow-me/rainbowkit/tree/main/packages/create-rainbowkit).
 
 ## Getting Started
