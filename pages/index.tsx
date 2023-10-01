@@ -17,28 +17,55 @@ interface CcipArguments {
 
 const Home: NextPage = () => {
   const { chain } = useNetwork();
-  console.log("chain:", chain);
 
   const [formData, setFormData] = useState<FormData>({
     sourceChain: chain ? getRouterConfig(String(chain.id)).chainSelector : "",
     destinationChain: "",
     destinationAddress: "",
-    tokenAddress: "", // link optioning
+    tokenAddress: "", // optioning
     amount: 0,
-    feeTokenAddress: "", // how do we fill this?...
+    feeTokenAddress: "", // there's a different address for tokens and for gas fees paid on token transactions
   });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    // Here, you can perform actions with the form data, e.g., send it to a server.
+    // what do we do with the args now?...
     console.log("Form data submitted:", formData);
   };
 
   // add token address (for different chains) here:
-  const [linkOptionValue, setLinkOption] = useState({
-    label: "LINK",
-    value: "",
+  const [LINKOptionValue, setLINKOption] = useState({
+    chainId: "",
+    tokenAddress: "",
   });
+
+  // others for other token addresses
+  const LINKOptions = [
+    {
+      chainId: "11155111",
+      chainName: "Ethereum Sepolia",
+      tokenAddress: "0x779877A7B0D9E8603169DdbD7836e478b4624789",
+    },
+    {
+      chainId: "80001",
+      chainName: "Polygon Mumbai",
+      tokenAddress: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+    },
+    {
+      chainId: "420",
+      chainName: "Optimism Goerli",
+      tokenAddress: "0xdc2CC710e42857672E7907CF474a69B63B93089f",
+    },
+    {
+      chainId: "412163",
+      chainName: "Arbitrum Goerli",
+      tokenAddress: "0xd14838A68E8AFBAdE5efb411d5871ea0011AFd28",
+    },
+    {
+      chainId: "43113",
+      tokenAddress: "0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846",
+    },
+  ];
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -62,6 +89,16 @@ const Home: NextPage = () => {
     // });
   };
 
+  const setTokenAddress = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    console.log(event.target.value);
+    // setFormData({
+    //   ...formData,
+    //   tokenAddress: event.target.value,
+    // });
+  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -74,6 +111,7 @@ const Home: NextPage = () => {
 
         <div className={styles.modal}>
           <form onSubmit={handleSubmit}>
+            {/* Destination chain */}
             <div>
               <label htmlFor="destinationChain">destination chain: </label>
               <select
@@ -91,6 +129,8 @@ const Home: NextPage = () => {
                 <option value="bnb">BNB</option>
               </select>
             </div>
+
+            {/* Destination address */}
             <div>
               <label htmlFor="destinationAddress">destination address:</label>
               <input
@@ -100,9 +140,11 @@ const Home: NextPage = () => {
                 name="destinationAddress"
               />
             </div>
+
+            {/* Token address */}
             <div>
               <label htmlFor="token">token: </label>
-              <select onChange={(e) => handleInputChange(e)} name="token">
+              <select onChange={(e) => setTokenAddress(e)} name="token">
                 <option value="">Select</option>
                 <option value="link">LINK</option>
                 <option value="uni">UNI</option>
@@ -111,6 +153,8 @@ const Home: NextPage = () => {
                 <option value="aave">AAVE</option>
               </select>
             </div>
+
+            {/* Amount */}
             <div>
               <label htmlFor="amount">amount:</label>
               <input
@@ -120,6 +164,8 @@ const Home: NextPage = () => {
                 name="amount"
               />
             </div>
+
+            {/* Fee token address */}
             <div>
               <label htmlFor="feeToken">pay with: </label>
               <select onChange={() => handleInputChange} name="feeToken">

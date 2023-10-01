@@ -35,14 +35,14 @@ const getRouterConfig = (network: any) => {
   switch (network) {
     case "11155111": // for ethereum sepolia
       return ethereumSepolia;
+    case "80001": // polygon mumbai
+      return polygonMumbai;
     case "420": // optimism goerli
       return optimismGoerli;
     case "412163": // arbitrum testnet
       return arbitrumTestnet;
     case "43113": // avalanche fuji
       return avalancheFuji;
-    case "80001": //
-      return polygonMumbai;
     default:
       throw new Error("Unknown network: " + network);
   }
