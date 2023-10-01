@@ -19,22 +19,13 @@ const Home: NextPage = () => {
   const { chain } = useNetwork();
   console.log("chain:", chain);
 
-  // useEffect(() => {
-  //   // get chain id
-  //   // get chainselector from routerConfig
-  //   if (chain) {
-  //     console.log(chain.id);
-  //     console.log(getRouterConfig(chain.id));
-  //   }
-  // }, [chain]);
-
   const [formData, setFormData] = useState<FormData>({
-    sourceChain: getRouterConfig(chain?.id),
+    sourceChain: chain ? getRouterConfig(String(chain.id)).chainSelector : "",
     destinationChain: "",
     destinationAddress: "",
-    tokenAddress: "",
+    tokenAddress: "", // link optioning
     amount: 0,
-    feeTokenAddress: "",
+    feeTokenAddress: "", // how do we fill this?...
   });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
@@ -49,19 +40,6 @@ const Home: NextPage = () => {
     value: "",
   });
 
-  const linkTokenAddresses = [
-    {
-      chain: "Sepolia",
-      chainId: 11155111,
-      address: "0x779877A7B0D9E8603169DdbD7836e478b4624789",
-    },
-    {
-      chain: "Polygon Testnet",
-      chainId: 80001,
-      address: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
-    },
-  ];
-
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
@@ -71,6 +49,17 @@ const Home: NextPage = () => {
       ...formData,
       [name]: value,
     });
+  };
+
+  const setDestinationChain = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    console.log(event.target.value);
+    console.log(getRouterConfig(event.target.value).chainSelector);
+    // setFormData({
+    //   ...formData,
+    //   destinationChain: event.target.value,
+    // });
   };
 
   return (
@@ -89,11 +78,12 @@ const Home: NextPage = () => {
               <label htmlFor="destinationChain">destination chain: </label>
               <select
                 name="destinationChain"
-                onChange={(e) => handleInputChange(e)}
+                onChange={(e) => setDestinationChain(e)}
               >
                 <option value="">Select</option>
-                <option value="ethereum">Ethereum</option>
-                <option value="polygon">Polygon</option>
+                {/* <option value="ethereum">Ethereum</option> */}
+                <option value="11155111">Ethereum</option>
+                <option value="80001">Polygon</option>
                 <option value="arbitrum">Arbitrum</option>
                 <option value="optimism">Optimism</option>
                 <option value="avalanche">Avalanche</option>
@@ -112,7 +102,7 @@ const Home: NextPage = () => {
             </div>
             <div>
               <label htmlFor="token">token: </label>
-              <select onChange={() => handleInputChange} name="token">
+              <select onChange={(e) => handleInputChange(e)} name="token">
                 <option value="">Select</option>
                 <option value="link">LINK</option>
                 <option value="uni">UNI</option>
