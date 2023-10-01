@@ -1,42 +1,35 @@
-import React, { useState, ChangeEvent } from "react";
-import Modal from "react-modal";
-import CustomField from "../components/CustomField";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import type { NextPage } from "next";
 import Head from "next/head";
-import styles from "../styles/Home.module.css";
+import { useState, useEffect } from "react";
 import { useNetwork } from "wagmi";
+import styles from "../styles/Home.module.css";
+import { getRouterConfig } from "./router";
 
-// Define your option type
-interface Option {
-  label: string;
-  value: string;
+interface CcipArguments {
+  sourceChain: any;
+  destinationChain: any;
+  destinationAddress: any;
+  tokenAddress: any;
+  amount: any;
+  feeTokenAddress: any;
 }
 
-const App: React.FC = () => {
-  const [isOpen] = useState(true);
-  const [fromChain, setFromChain] = useState<Option | null>(null);
-  const [toChain, setToChain] = useState<Option | null>(null);
-
-  const allOptions: Option[] = [
-    { label: "Ethereum Mainnet", value: "Ethereum Mainnet" },
-    { label: "Polygon", value: "Polygon" },
-    { label: "Arbitrum", value: "Arbitrum" },
-    { label: "Avalanche", value: "Avalanche" },
-    { label: "Optimism", value: "Optimism" },
-  ];
-
+const Home: NextPage = () => {
   const { chain } = useNetwork();
-  interface CcipArguments {
-    sourceChain: any;
-    destinationChain: any;
-    destinationAddress: any;
-    tokenAddress: any;
-    amount: any;
-    feeTokenAddress: any;
-  }
+  console.log("chain:", chain);
 
-  const [formData, setFormData] = useState<CcipArguments>({
-    sourceChain: chain?.name,
+  // useEffect(() => {
+  //   // get chain id
+  //   // get chainselector from routerConfig
+  //   if (chain) {
+  //     console.log(chain.id);
+  //     console.log(getRouterConfig(chain.id));
+  //   }
+  // }, [chain]);
+
+  const [formData, setFormData] = useState<FormData>({
+    sourceChain: getRouterConfig(chain?.id),
     destinationChain: "",
     destinationAddress: "",
     tokenAddress: "",
@@ -44,37 +37,35 @@ const App: React.FC = () => {
     feeTokenAddress: "",
   });
 
-  const fromOptions = allOptions.filter((option) => option !== toChain);
-  const toOptions = allOptions.filter((option) => option !== fromChain);
-
-  const handleTransaction = () => {
-    console.log("Transaction started");
-  };
-
-  const connectWallet = () => {
-    console.log("Connecting to wallet");
-  };
-
-  // Further down, you'd also need to update the type for the event parameter in your onChange handlers:
-  const handleDropdownChange = (
-    e: ChangeEvent<HTMLSelectElement>,
-    setFunction: React.Dispatch<React.SetStateAction<Option | null>>
-  ) => {
-    const selectedValue = e.target.value;
-    const selectedOption =
-      allOptions.find((option) => option.value === selectedValue) || null;
-    setFunction(selectedOption);
-  };
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     // Here, you can perform actions with the form data, e.g., send it to a server.
     console.log("Form data submitted:", formData);
   };
 
+  // add token address (for different chains) here:
+  const [linkOptionValue, setLinkOption] = useState({
+    label: "LINK",
+    value: "",
+  });
+
+  const linkTokenAddresses = [
+    {
+      chain: "Sepolia",
+      chainId: 11155111,
+      address: "0x779877A7B0D9E8603169DdbD7836e478b4624789",
+    },
+    {
+      chain: "Polygon Testnet",
+      chainId: 80001,
+      address: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+    },
+  ];
+
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
+    console.log(event.target.value);
     const { name, value } = event.target;
     setFormData({
       ...formData,
@@ -83,96 +74,76 @@ const App: React.FC = () => {
   };
 
   return (
-    <div>
-      {/*  className={styles.container} */}
+    <div className={styles.container}>
       <Head>
         <title>CCIP Dapp</title>
         <link href="/favicon.ico" rel="icon" />
       </Head>
-      <main>
-        <div className="bg-[#131313] min-h-screen">
-          <header className="p-4 z-10">
-            <img src="/images/logo.png" alt="Header logo" className="h-16" />
-          </header>
-          <Modal
-            isOpen={isOpen}
-            contentLabel="Crypto and Chain Modal"
-            style={{
-              content: {
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                backgroundColor: "#131313",
-                borderRadius: "10px",
-                height: "450px",
-                boxShadow:
-                  "rgb(170 21 197 / 30%) 0 0 10px 0, rgb(170 21 197 / 30%) 0 40px 120px 0",
-              },
-              overlay: {
-                backgroundColor: "rgba(255, 255, 255, 0.75)", // This is for testing purposes
-              },
-            }}
-          >
-            <ConnectButton />
 
-            <form onSubmit={handleSubmit}>
-              <CustomField
-                type="dropdown"
-                label="From"
-                options={fromOptions}
-                onChange={() => handleInputChange}
-              />
+      <main className={styles.main}>
+        <ConnectButton />
 
-              <CustomField
-                type="dropdown"
-                label="To"
-                options={toOptions}
-                onChange={() => handleInputChange}
-              />
-
-              <CustomField
-                type="dropdown"
-                label="Token"
-                options={[
-                  { label: "MKR", value: "MKR" },
-                  // value depends on chain we're on...
-                  { label: "LINK", value: "LINK" },
-                  // ... other options
-                ]}
-                onChange={() => handleInputChange}
-              />
-
-              <CustomField
+        <div className={styles.modal}>
+          <form onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="destinationChain">destination chain: </label>
+              <select
+                name="destinationChain"
+                onChange={(e) => handleInputChange(e)}
+              >
+                <option value="">Select</option>
+                <option value="ethereum">Ethereum</option>
+                <option value="polygon">Polygon</option>
+                <option value="arbitrum">Arbitrum</option>
+                <option value="optimism">Optimism</option>
+                <option value="avalanche">Avalanche</option>
+                <option value="base">Base</option>
+                <option value="bnb">BNB</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="destinationAddress">destination address:</label>
+              <input
+                onChange={handleInputChange}
                 type="text"
-                label="Amount"
-                placeholder="0"
-                onChange={() => handleInputChange}
+                id="destinationAddress"
+                name="destinationAddress"
               />
-
-              <button type="submit">Bridge</button>
-            </form>
-
-            {/* <div className="flex justify-between mt-4">
-              <button
-                className="w-[calc(50%-0.5rem)] bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-[10px]"
-                onClick={connectWallet}
-              >
-                Connect to Wallet
-              </button>
-
-              <button
-                onClick={handleTransaction}
-                className="w-[calc(50%-0.5rem)] bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-[10px]"
-              >
-                Start Transaction
-              </button>
-            </div> */}
-          </Modal>
+            </div>
+            <div>
+              <label htmlFor="token">token: </label>
+              <select onChange={() => handleInputChange} name="token">
+                <option value="">Select</option>
+                <option value="link">LINK</option>
+                <option value="uni">UNI</option>
+                <option value="mkr">MKR</option>
+                <option value="usdc">USDC</option>
+                <option value="aave">AAVE</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="amount">amount:</label>
+              <input
+                onChange={handleInputChange}
+                type="text"
+                id="amount"
+                name="amount"
+              />
+            </div>
+            <div>
+              <label htmlFor="feeToken">pay with: </label>
+              <select onChange={() => handleInputChange} name="feeToken">
+                <option value="">Select</option>
+                <option value="link">LINK</option>
+                <option value="native">Native</option>
+              </select>
+            </div>
+            <button type="submit">Bridge</button>
+          </form>
         </div>
       </main>
     </div>
   );
 };
 
-export default App;
+export default Home;

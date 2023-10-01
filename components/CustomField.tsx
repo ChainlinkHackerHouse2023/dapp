@@ -8,6 +8,7 @@ interface Option {
 interface CustomFieldProps {
   label: string;
   type: "text" | "dropdown";
+  name: string;
   options?: Option[];
   placeholder?: string;
   onChange: <T extends HTMLInputElement | HTMLSelectElement>(
@@ -46,6 +47,7 @@ const CustomField: FC<CustomFieldProps> = ({
         <input
           type={type}
           placeholder={placeholder}
+          name={name}
           onChange={(e) => onChange(e as ChangeEvent<HTMLInputElement>)}
           className="w-full text-lg text-white bg-transparent appearance-none"
         />
